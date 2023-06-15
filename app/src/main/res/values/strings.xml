@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">QuizzApp</string>
+    <string name="total_questions">Total Questions</string>
+    <string name="the_question">The question</string>
+    <string name="answer_a">answer A</string>
+    <string name="answer_b">answer B</string>
+    <string name="answer_c">answer C</string>
+    <string name="answer_d">answer D</string>
+    <string name="submit">Submit</string>
 </resources>

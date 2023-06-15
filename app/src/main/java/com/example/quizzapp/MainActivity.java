@@ -3,7 +3,6 @@ package com.example.quizzapp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button answerC;
     Button answerD;
 
-    Button submitButton;
 
     private String selectedAnswer = "";
     private int currentQuestionIndex = 0;
@@ -31,6 +29,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
         totalQuestionsTextView = findViewById(R.id.totalQuestions);
         questionTextView = findViewById(R.id.question);
 
@@ -39,10 +40,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         answerC = findViewById(R.id.answerC);
         answerD = findViewById(R.id.answerD);
 
-        submitButton = findViewById(R.id.submitButton);
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         totalQuestions = QuestionandAnswers.question.length;
 
@@ -55,48 +52,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        answerA.setOnClickListener(this);
-        answerB.setOnClickListener(this);
-        answerC.setOnClickListener(this);
-        answerD.setOnClickListener(this);
-        submitButton.setOnClickListener(this);
-
-        Button clickedButton = (Button) view;
-
-        if(clickedButton.getId()==R.id.submitButton){
-            if(selectedAnswer.equals(QuestionandAnswers.correctAnswers[currentQuestionIndex])){
-                score++;
-                currentQuestionIndex++;
-                loadNewQuestion();
-            }
-        }
-        else{
-            selectedAnswer = clickedButton.getText().toString();
-            clickedButton.setBackgroundColor(Color.BLUE);
-            answerA.setBackgroundColor(Color.WHITE);
-            answerB.setBackgroundColor(Color.WHITE);
-            answerC.setBackgroundColor(Color.WHITE);
-            answerD.setBackgroundColor(Color.WHITE);
-
-
+        if (view == answerA || view == answerB || view == answerC || view == answerD) {
+            selectAnswer((Button) view);
+            checkAnswer();
         }
     }
 
-    void loadNewQuestion(){
-        questionTextView.setText(QuestionandAnswers.question[currentQuestionIndex]);
-        answerA.setText(QuestionandAnswers.choices[currentQuestionIndex][0]);
-        answerB.setText(QuestionandAnswers.choices[currentQuestionIndex][0]);
-        answerC.setText(QuestionandAnswers.choices[currentQuestionIndex][0]);
-        answerD.setText(QuestionandAnswers.choices[currentQuestionIndex][0]);
 
-        if(currentQuestionIndex==totalQuestions){
+    private void selectAnswer(Button button) {
+        deselectAllAnswers();
+        button.setBackgroundColor(Color.BLUE);
+        selectedAnswer = button.getText().toString();
+    }
+
+
+    private void deselectAllAnswers() {
+        answerA.setBackgroundColor(Color.WHITE);
+        answerB.setBackgroundColor(Color.WHITE);
+        answerC.setBackgroundColor(Color.WHITE);
+        answerD.setBackgroundColor(Color.WHITE);
+    }
+
+    private void checkAnswer() {
+        if (selectedAnswer.equals(QuestionandAnswers.correctAnswers[currentQuestionIndex])) {
+            score++;
+        }
+        currentQuestionIndex++;
+        loadNewQuestion();
+    }
+
+    void loadNewQuestion() {
+        if (currentQuestionIndex < totalQuestions) {
+            questionTextView.setText(QuestionandAnswers.question[currentQuestionIndex]);
+            answerA.setText(QuestionandAnswers.choices[currentQuestionIndex][0]);
+            answerB.setText(QuestionandAnswers.choices[currentQuestionIndex][1]);
+            answerC.setText(QuestionandAnswers.choices[currentQuestionIndex][2]);
+            answerD.setText(QuestionandAnswers.choices[currentQuestionIndex][3]);
+        } else {
             finishQuiz();
-            return;
         }
     }
-    void finishQuiz() {
-        String results = "";
 
+
+    void finishQuiz() {
+        String results;
         if (score > totalQuestions * 0.60) {
             results = "You did well!";
         } else {
