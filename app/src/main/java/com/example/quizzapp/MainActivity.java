@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int currentQuestionIndex = 0;
     private int score = 0;
     private int totalQuestions = 0;
+    private static final int ANSWER_BUTTON_COLOR = Color.parseColor("#45C84B");
 
 
     @Override
@@ -41,47 +42,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         answerD = findViewById(R.id.answerD);
 
 
-        totalQuestions = QuestionandAnswers.question.length;
+        String totalQuestionsText = getString(R.string.total_questions) + totalQuestions;
+        totalQuestionsTextView.setText(totalQuestionsText);
 
-        totalQuestionsTextView.setText("Total Questions: " + totalQuestions);
+        setAnswerButtonColors();
 
+        answerA.setOnClickListener(this);
+        answerB.setOnClickListener(this);
+        answerC.setOnClickListener(this);
+        answerD.setOnClickListener(this);
 
         loadNewQuestion();
-
     }
+
+
+
 
     @Override
     public void onClick(View view) {
         if (view == answerA || view == answerB || view == answerC || view == answerD) {
             selectAnswer((Button) view);
             checkAnswer();
+            loadNewQuestion();
         }
     }
+
+
+    private void setAnswerButtonColors() {
+        answerA.setBackgroundColor(ANSWER_BUTTON_COLOR);
+        answerB.setBackgroundColor(ANSWER_BUTTON_COLOR);
+        answerC.setBackgroundColor(ANSWER_BUTTON_COLOR);
+        answerD.setBackgroundColor(ANSWER_BUTTON_COLOR);
+
+        answerA.setTextColor(Color.WHITE);
+        answerB.setTextColor(Color.WHITE);
+        answerC.setTextColor(Color.WHITE);
+        answerD.setTextColor(Color.WHITE);
+    }
+
 
 
     private void selectAnswer(Button button) {
         deselectAllAnswers();
-        button.setBackgroundColor(Color.BLUE);
         selectedAnswer = button.getText().toString();
     }
 
-
     private void deselectAllAnswers() {
-        answerA.setBackgroundColor(Color.WHITE);
-        answerB.setBackgroundColor(Color.WHITE);
-        answerC.setBackgroundColor(Color.WHITE);
-        answerD.setBackgroundColor(Color.WHITE);
+        answerA.setBackgroundColor(ANSWER_BUTTON_COLOR);
+        answerB.setBackgroundColor(ANSWER_BUTTON_COLOR);
+        answerC.setBackgroundColor(ANSWER_BUTTON_COLOR);
+        answerD.setBackgroundColor(ANSWER_BUTTON_COLOR);
     }
 
     private void checkAnswer() {
-        if (selectedAnswer.equals(QuestionandAnswers.correctAnswers[currentQuestionIndex])) {
+        String correctAnswer = QuestionandAnswers.correctAnswers[currentQuestionIndex];
+        if (selectedAnswer.equalsIgnoreCase(correctAnswer)) {
             score++;
         }
         currentQuestionIndex++;
-        loadNewQuestion();
     }
 
+
+
+
     void loadNewQuestion() {
+        totalQuestions = QuestionandAnswers.question.length;
+
         if (currentQuestionIndex < totalQuestions) {
             questionTextView.setText(QuestionandAnswers.question[currentQuestionIndex]);
             answerA.setText(QuestionandAnswers.choices[currentQuestionIndex][0]);
@@ -96,7 +122,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     void finishQuiz() {
         String results;
-        if (score > totalQuestions * 0.60) {
+        int correctAnswers = score; // Only count the number of correct answers
+
+        if (correctAnswers > totalQuestions * 0.60) {
             results = "You did well!";
         } else {
             results = "You can always try again and do better!";
@@ -104,10 +132,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         new AlertDialog.Builder(this)
                 .setTitle(results)
-                .setMessage("Your score is " + score + " out of " + totalQuestions)
+                .setMessage("Your score is " + correctAnswers + " out of " + totalQuestions)
                 .setPositiveButton("Restart", (DialogInterface dialog, int i) -> restartQuiz())
                 .show();
     }
+
 
     void restartQuiz() {
         score = 0;
